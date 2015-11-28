@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>index.html</title></head>
+<body>CSE559a Computer Vision<br><div style="text-align: center;">Project 2 : &nbsp;Panorama Mosaic Stitching<br>Ding Yiheng<br>02/15/2015<br><div style="text-align: left;"><big style="font-weight: bold;"><big><big>1.Summary</big></big></big><br>&nbsp;
+&nbsp; (1).The first step to warp an image into spherical coordinate
+works well and I apply radial distortion to this part. The coefficient
+of the k1 and k2 is derived from calibration toolkit supported by <span style="color: rgb(0, 0, 0); font-family: Simsun; font-size: medium; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; display: inline ! important; float: none; background-color: rgb(255, 255, 255);">Jean-Yves Bouguet</span>.<br><div style="text-align: center;"><img style="width: 240px; height: 211px;" alt="checkBox" src="images/1.jpg"><img src="images/2.jpg" alt="extrinsic" style="width: 238px; height: 208px;"><img style="width: 240px; height: 209px;" alt="extrinsic_2" src="images/3.jpg"><img style="width: 241px; height: 210px;" alt="error_analyse" src="images/4.jpg"><img style="width: 789px; height: 406px;" alt="calibration" src="images/5.jpg"><img style="width: 330px; height: 403px;" alt="warp_image" src="images/6.jpg"><br></div>&nbsp;
+&nbsp; (2).About the features detection and feature descriptor, I
+didm't use my own one but use the sift.The program is provided by lowe.
+But the ratio match is finished by my self and works well.<br>&nbsp; &nbsp; (3).The ransac also works well, I get almost exact result after I running it on the test_set.<br>&nbsp;
+&nbsp; (4).So once the ransan is good, the neighborhood translations is
+also good. The picture below showing the comparison between my
+calculation result and the example result. (pairlist.txt is my own one)<br><div style="text-align: center;"><img style="width: 713px; height: 293px;" alt="comparison_ransac" src="images/7.jpg"><br></div>&nbsp;
+&nbsp; (5).I choose to correct every single col by using the ratio =
+(total drift)*(x of col)/(total x direction length),and It works well,
+but there is still the possiblity that the good result comes from the
+using of tripod, so there is not too severe drift in y direction. The
+picture below showing the comparison between my result and example
+result on yosemite.The drift has been well handled. <br><img style="width: 1590px; height: 212px;" alt="drift" src="images/16.jpg"><br><img style="width: 1588px; height: 212px;" alt="no drift" src="images/15.jpg"><br>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;Beside the drift, the second question is the
+left trim, Because we are doing an panorama, so we often retake the
+first picture again, So in order to prevent the same object from
+appearing in the same panorama , we trim the left edge and subtract the
+total width by one image's width. But, in some panorama, it's not
+acutually a panorama, which is 360. like the picture below, it's
+clearly not 360 picture, so we don't need to trim it.<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;So,my algorithm keep the total width and seamlessly combine all the 4 images of yosemite.<br><div style="text-align: center;"><img style="width: 854px; height: 251px;" alt="self_yosemite" src="images/8.jpg"><br></div><div style="text-align: center;"><img style="width: 541px; height: 280px;" alt="example_yosemite" src="images/9.jpg"><br></div>&nbsp; &nbsp; (6).I used two way of blending. or should not use blending.<br>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; The First one is the x direction feathering
+and it did works very good but there exists the problem of ghosting and
+can not handle the exposure problem.<br>&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; The second way is the image cut and blend. The algorithm will
+choose which part to use instead of blending all of them and also to
+feathering blend in the seam of each image pair.<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; The result will be showed in the second part(extra credit 1~2)<br><div style="text-align: center;"><img style="width: 851px; height: 431px;" alt="cut and blend" src="images/17.jpg"><br><div style="text-align: left;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;This is how I did my blend and cut job,
+the red color means the pixel for the left most image, blue for middle
+one, green for right most one.The yellow area means blend using
+feathering.<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;I simply use the
+former image's pixel information and when reach the boundary, I use the
+feathering method to blend. so the result will be better.</div></div><div style="text-align: center;"><div style="text-align: left;"><big style="font-weight: bold;"><big><big>2.Extra Credit</big></big></big><br>&nbsp; &nbsp; 1.de-ghost.<br>&nbsp; &nbsp; 2.same person in different picture.<br>&nbsp; &nbsp; 3.graph cut<br><div style="text-align: center;"><img style="width: 1473px; height: 395px;" alt="x direction feathering" src="images/10.jpg"><br><img style="width: 1475px; height: 396px;" alt="cut but also blend" src="images/11.jpg"><br><div style="text-align: left;">&nbsp;
+&nbsp; My classmate Wu lei ran across each shot when I took the image
+for panorama, So this set of images make me finsh the de-ghost and one
+person in each camera three parts in once.<br>&nbsp; &nbsp; We can see
+from the upper picture which applied the x direction feathring. So we
+can see the person like a ghost appeared in each picture and being
+transparent .This happened because the moving object walk across each
+picture, object A do not appear in the same blend area, so, after
+feathering, the object A will have weight less than 1 so appeared like
+transparent .<br>&nbsp; &nbsp; The detail of implement has been discussed in the (6) in part 1 summary.<br>&nbsp;
+&nbsp; The best solution is to use cut but not blend, decide to use
+which part of image instead of blending them all. But the result is
+also bad when it comes to the edge,I mean it can not achieve
+"seamless", So I made feathering blend on a relatively narrow area
+around the seam of each image pair.<br><br>&nbsp; &nbsp; 4.apply raidal distortion<br><div style="text-align: left;">&nbsp;
+&nbsp; &nbsp; &nbsp;I apply the radial distortion within the
+warpSpherical.cpp, the coefficients come from the calibration using
+check box. I took 24 checkbox picture from different angle and
+calibrate the camera to derive the exact parameter for focal length and
+k1 k2.<br><div style="text-align: center;">&nbsp;<img style="width: 690px; height: 607px;" alt="checkbox" src="images/14.jpg"></div></div><div style="text-align: center;">&nbsp; &nbsp; &nbsp; &nbsp;<img style="width: 480px; height: 640px;" alt="image without distortion" src="images/12.jpg"><img style="width: 480px; height: 640px;" alt="image with radial distortion" src="images/13.jpg"><br>&nbsp;
+&nbsp; &nbsp;left image: without radial distortion &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; right image: with radial distortion<br><div style="text-align: left;"><big style="font-weight: bold;"><big><big>3.Panorama</big></big></big><br>&nbsp; &nbsp; 1.campus from test_set<br><img style="width: 1588px; height: 212px;" alt="no drift" src="images/15.jpg"><br><div style="text-align: center;"><a href="images/15.jpg">High resolution</a></div>&nbsp; &nbsp; 2.own image set<br><div style="text-align: center;"><img style="width: 1559px; height: 409px;" alt="self" src="images/pano.jpg"><br><a href="images/pano.jpg">High resolution</a></div></div></div></div></div></div></div></div></div></body></html>

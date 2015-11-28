@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>index.html</title></head>
+<body>CSE559a Computer Vision<br><div style="text-align: center;"><big style="font-weight: bold;"><big>Project 1 : Feature Detection and Matching<br><small>Ding yiheng<br>02/01/2015</small><br></big></big><div style="text-align: left;"><big><big>1.Feature Detection <br>&nbsp;
+&nbsp; &nbsp; &nbsp; Feature detection contains three steps, (1) first
+to calculate the gradient, which is the derivative in x and y
+directions of &nbsp;a pixel, I use sobel operator to get this, (2)
+compute the harris matrix for each pixel so that we can generate the
+harris operator to indicate how good or bad a feature is .(3)the last
+step is to filter all the useless points with low harris value by using
+threshold and get the local maximum in each pixel's eightborhood.<br>&nbsp;
+&nbsp; &nbsp; &nbsp; The thing will varied from each circumstance is
+two parameters, the sigma of gaussian and the threshold of filtering
+the bad features.<br>&nbsp; &nbsp; &nbsp; &nbsp; The gaussian matrix is
+used to do a convultion with detected point's 5*5 neighborhood to give
+weight of each harris matrix, the closer to the feature point ,the more
+important the value is. The sigma value determine how fast the weight
+go down from center to the margin of gaussian mask and we need it to be
+optimized.The value chosen by me is 1.25 because it works well. I try
+2.00,1.5,0.5,0.8, they mess things up, so.<br>&nbsp; &nbsp; &nbsp;
+&nbsp; The second thing is threshold ,the point with value below it be
+filtered out, this value should be seperately adjust and chosen for
+each different pictures, as my own experience, even a piture is just
+slightly rotated from another one, the threshold will be different if
+you want to find same number of features.The healthy number of features
+is about 500, more or less both are bad.<br><br>2.Feature Description<br>&nbsp;
+&nbsp; &nbsp; &nbsp; Beside the easy-to-implement 5*5 window
+descriptor, I choose the simplified sifi descriptor which contains the
+rotation-invariant feature.<br>&nbsp; &nbsp; &nbsp; &nbsp; When a
+feature is detected, firstly, calculate the eigenvalue by using harris
+matrix to determine the orientation of this feature, so ,by the
+original method ,we take a vertical-horizontal 16*16 matrix to be the
+descriptor matrix, and now ,given the eigenvector's direction , rotate
+the 16*16 to that direction, and each coordination will result in a
+non-integer coordination, so we interpolate the gray level by taking
+the nearest square shaded four points into consideration, which is
+called bilinear.and then, get the derivative of each point and store
+the angle between this vector and eigenvector. By dividing the 16*16
+matrix into 16 parts, and each part contains a 8 directions histogram
+indicating the module and number of each pixel, in other word , a 128
+dimensional vector to describe the feature, which is rotation invariant.<br><br>3.Feature Matching<br>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;The projetc already give us the SSD which
+don't need any modification and I implemented the ratio matching just
+by testing the ratio between the best result and second result, so we
+also need a threshold here, and of course, varied from different
+matching images.<br><br>4.Performance<br>(1)harris Image<br></big></big><div style="text-align: center;"><big><big><img style="width: 600px; height: 478px;" alt="graf_harris" src="image/harris_graf.jpg"> &nbsp; &nbsp; &nbsp; &nbsp;<img style="width: 640px; height: 480px;" alt="Yosemite_harris" src="image/harris_Yosemite.jpg"></big></big><br><div style="text-align: left;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;harris value image of graf &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;harris value image of Yosemite </div></div><big><big><br>(2)ROC<br></big></big><div style="text-align: center;"><big><big><img style="width: 640px; height: 480px;" alt="graf_roc" src="image/graf.roc.jpg"><img style="width: 640px; height: 480px;" alt="Yosemite_roc" src="image/Yosemite.roc.jpg"></big></big><br><div style="text-align: left;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; roc of graf &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;roc of
+Yosemite</div></div><big><big><br>(3)AUC<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;here is the auc of my program running on the benchmark images.<br>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;But there are some problem I don't
+understand, if I run program for each match and generate the auc,they
+look good, but by using benchmark command, somewhere has result showing
+below,-1.#IND0000.<br></big></big><table style="width: 1462px; height: 144px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2"><tbody><tr><td></td><td>window+ssd</td><td>window+ratio</td><td>newMethod+ssd</td><td>newMethod+ratio</td></tr><tr><td>bikes</td><td>0.414296</td><td>0.391344</td><td>0.436545</td><td>0.01</td></tr><tr><td>graf</td><td>0.627643</td><td>0.565495</td><td>0.01</td><td>0.01</td></tr><tr><td>leuven</td><td>0.01</td><td>0.01</td><td>0.689625</td><td>0.64565</td></tr><tr><td>wall</td><td>0.610628</td><td>0.608995</td><td>0.36082</td><td>0.01</td></tr></tbody></table><big><big><br>5.Strength and Weakness<br>&nbsp; &nbsp; &nbsp; 1.my feature detection is excellent, the feature points can be correctly detected in each situation.<br>&nbsp; &nbsp; &nbsp; 2.my descriptor is rotation invariant.<br>&nbsp;
+&nbsp; &nbsp; 3.But my descriptor doesn't take consideration of scale
+and exposure invariant and can't deal with affine transformation.<br>6.My own Images<br></big></big><div style="text-align: center;"><big><big>&nbsp; &nbsp;<img style="width: 494px; height: 659px;" alt="my1" src="image/MY1.jpg"><img style="width: 493px; height: 657px;" alt="my2" src="image/MY2.jpg"></big></big><br><img style="width: 525px; height: 699px;" alt="my1_harris" src="image/MY1_harris.jpg"><img style="width: 527px; height: 701px;" alt="my2_harris" src="image/MY2_harris.jpg"><br><img style="width: 1572px; height: 565px;" alt="matchMy" src="image/match.jpg"><br></div><big><big><br></big></big><big><big>7.Extra credit<br>&nbsp; &nbsp; &nbsp; My code has implemented the rotation invariant descriptor, the difference represented in roc showing below:<br></big></big><div style="text-align: center;"><big><big><img src="image/rotation_invariant_with_none_RI.roc.jpg" alt="RI with no RI" style="width: 640px; height: 480px;"></big></big><br></div><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br></div></div></body></html>
